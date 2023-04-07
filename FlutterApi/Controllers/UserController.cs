@@ -18,6 +18,7 @@ namespace FlutterApi.Controllers
         }
 
         [HttpGet]
+        [Route("GetUsers")]
         public IActionResult GetUsers()
         {
             //var a = new {Guid Id, string? Name, string? Email};
@@ -92,7 +93,7 @@ namespace FlutterApi.Controllers
         }
 
         [HttpDelete]
-        [Route("{id:guid}")]
+        [Route("Delete/{id:guid}")]
         public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
         {
             var user = await dbContext.Users.FindAsync(id);
@@ -106,6 +107,36 @@ namespace FlutterApi.Controllers
             }
 
             return NotFound();
+        }
+
+        [HttpGet]
+        [Route("GetUsersGmail")]
+        public IActionResult GetUsersGmails()
+        {
+            //var a = new {Guid Id, string? Name, string? Email};
+            var user = dbContext.Users.Select(p => new
+            {
+                Id = p.id,
+                Name = p.name,
+                Email = p.email
+            }).Where(z=> z.Email.Contains("@mail.ru"));
+
+            return Ok(user);
+        }
+
+        [HttpGet]
+        [Route("GetUsersArsenii")]
+        public IActionResult GetUsersAsrenii()
+        {
+            //var a = new {Guid Id, string? Name, string? Email};
+            var user = dbContext.Users.Select(p => new
+            {
+                Id = p.id,
+                Name = p.name,
+                Email = p.email
+            }).Where(z => z.Name == "Арсений");
+
+            return Ok(user);
         }
     }
 }
