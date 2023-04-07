@@ -2,6 +2,7 @@
 using FlutterApi.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Entity.Core.Objects;
 
 namespace FlutterApi.Controllers
 {
@@ -17,16 +18,29 @@ namespace FlutterApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public IActionResult GetUsers()
         {
-            return Ok(await dbContext.Users.ToListAsync());
+            //var a = new {Guid Id, string? Name, string? Email};
+            var user = dbContext.Users.Select(p => new
+            {
+                Id = p.id,
+                Name = p.name,
+                Email = p.email
+            });
+            
+            return Ok(user);
         }
 
         [HttpGet]
         [Route("{id:guid}")]
-        public async Task<IActionResult> GetUser([FromRoute] Guid id)
+        public IActionResult GetUser([FromRoute] Guid id)
         {
-            var user = await dbContext.Users.FindAsync(id);
+            var user = dbContext.Users.Select(p => new
+            {
+                Id = p.id,
+                Name = p.name,
+                Email = p.email
+            }).Where(z => z.Id == id);
 
             if (user == null)
             {
@@ -51,7 +65,7 @@ namespace FlutterApi.Controllers
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            return Ok(user);
+            return Ok();
         }
 
         [HttpPut]
@@ -60,16 +74,18 @@ namespace FlutterApi.Controllers
         {
             var user = dbContext.Users.Find(id);
 
-            if(user != null)
+            if (updateUserRequest.name != null) user.name = updateUserRequest.name;
+            if (updateUserRequest.email != null) user.email = updateUserRequest.email;
+
+            if (user != null)
             {
-                user.name = updateUserRequest.name;
-                user.email = updateUserRequest.email;
-                user.password = updateUserRequest.password;
+                user.name = user.name;
+                user.email = user.email;
                 user.UpdateTime = DateTime.Now;
 
                 await dbContext.SaveChangesAsync();
 
-                return Ok(user);
+                return Ok(GetUser(id));
             }
 
             return NotFound();
