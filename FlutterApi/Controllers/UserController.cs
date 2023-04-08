@@ -24,7 +24,7 @@ namespace FlutterApi.Controllers
             //var a = new {Guid Id, string? Name, string? Email};
             var user = dbContext.Users.Select(p => new
             {
-                Id = p.id,
+                Id = p.Id,
                 Name = p.name,
                 Email = p.email
             });
@@ -33,12 +33,12 @@ namespace FlutterApi.Controllers
         }
 
         [HttpGet]
-        [Route("{id:guid}")]
-        public IActionResult GetUser([FromRoute] Guid id)
+        [Route("GetUser/{id:int}")]
+        public IActionResult GetUser([FromRoute] int id)
         {
             var user = dbContext.Users.Select(p => new
             {
-                Id = p.id,
+                Id = p.Id,
                 Name = p.name,
                 Email = p.email
             }).Where(z => z.Id == id);
@@ -52,11 +52,11 @@ namespace FlutterApi.Controllers
         }
 
         [HttpPost]
+        [Route("Add")]
         public async Task<IActionResult> AddUser(AddUserRequest addUserRequest)
         {
             var user = new User()
             {
-                id = Guid.NewGuid(),
                 name = addUserRequest.name,
                 email = addUserRequest.email,
                 password = addUserRequest.password,
@@ -66,12 +66,12 @@ namespace FlutterApi.Controllers
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            return Ok();
+            return Ok("Пользователь добавлен!");
         }
 
         [HttpPut]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateUser([FromRoute] Guid id, UpdateUserRequest updateUserRequest)
+        [Route("Update/{id:int}")]
+        public async Task<IActionResult> UpdateUser([FromRoute] int id, UpdateUserRequest updateUserRequest)
         {
             var user = dbContext.Users.Find(id);
 
@@ -93,8 +93,8 @@ namespace FlutterApi.Controllers
         }
 
         [HttpDelete]
-        [Route("Delete/{id:guid}")]
-        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
+        [Route("Delete/{id:int}")]
+        public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
             var user = await dbContext.Users.FindAsync(id);
 
@@ -103,40 +103,10 @@ namespace FlutterApi.Controllers
                 dbContext.Users.Remove(user);
                 await dbContext.SaveChangesAsync();
 
-                return Ok(user);
+                return Ok("Пользователь удален!");
             }
 
             return NotFound();
-        }
-
-        [HttpGet]
-        [Route("GetUsersGmail")]
-        public IActionResult GetUsersGmails()
-        {
-            //var a = new {Guid Id, string? Name, string? Email};
-            var user = dbContext.Users.Select(p => new
-            {
-                Id = p.id,
-                Name = p.name,
-                Email = p.email
-            }).Where(z=> z.Email.Contains("@mail.ru"));
-
-            return Ok(user);
-        }
-
-        [HttpGet]
-        [Route("GetUsersArsenii")]
-        public IActionResult GetUsersAsrenii()
-        {
-            //var a = new {Guid Id, string? Name, string? Email};
-            var user = dbContext.Users.Select(p => new
-            {
-                Id = p.id,
-                Name = p.name,
-                Email = p.email
-            }).Where(z => z.Name == "Арсений");
-
-            return Ok(user);
         }
     }
 }
