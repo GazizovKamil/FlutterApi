@@ -16,8 +16,8 @@ namespace FlutterApi.Data
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            //services.AddDbContext<FlutterApiDB>(options =>
-            //    options.UseSqlServer(services..GetConnectionString("FlutterApiConnectionString")));
+            services.AddDbContext<FlutterApiDB>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("FlutterApiConnectionString")));
 
             services.AddSwaggerGen(c =>
             {
