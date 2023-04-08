@@ -39,7 +39,8 @@ namespace FlutterApi.Data
 
             // Plug-in WebSockets middleware
             app.UseWebSockets();
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();
