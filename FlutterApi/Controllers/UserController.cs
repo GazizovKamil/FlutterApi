@@ -1,6 +1,8 @@
 ﻿using FlutterApi.Data;
+using FlutterApi.Hubs;
 using FlutterApi.Models.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Entity.Core.Objects;
 
@@ -11,10 +13,12 @@ namespace FlutterApi.Controllers
     public class UserController : Controller
     {
         private readonly FlutterApiDB dbContext;
+        private readonly IHubContext<SignalrHub> _hubContext;
 
-        public UserController(FlutterApiDB dbContext)
+        public UserController(FlutterApiDB dbContext, IHubContext<SignalrHub> hubContext)
         {
             this.dbContext = dbContext;
+            this._hubContext = hubContext;
         }
 
         [HttpGet]
@@ -65,6 +69,7 @@ namespace FlutterApi.Controllers
 
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
+            await _hubContext.Clients.All.SendAsync("User", user);
 
             return Ok("Пользователь добавлен!");
         }
@@ -85,6 +90,7 @@ namespace FlutterApi.Controllers
                 user.UpdateTime = DateTime.Now;
 
                 await dbContext.SaveChangesAsync();
+                await _hubContext.Clients.All.SendAsync("User", user);
 
                 return Ok(GetUser(id));
             }
@@ -102,6 +108,7 @@ namespace FlutterApi.Controllers
             {
                 dbContext.Users.Remove(user);
                 await dbContext.SaveChangesAsync();
+                await _hubContext.Clients.All.SendAsync("User", user);
 
                 return Ok("Пользователь удален!");
             }
