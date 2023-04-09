@@ -18,7 +18,7 @@ namespace FlutterApi.Data
             services.AddControllers();
             services.AddDbContext<FlutterApiDB>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("FlutterApiConnectionString")));
-
+            services.AddSignalR();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FlutterApi", Version = "v1" });
